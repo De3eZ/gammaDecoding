@@ -1,67 +1,39 @@
 import java.net.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.sql.Array;
+
 class Server extends Thread
 {
-    public String decryption(String text,String gamma)
+    public String caesar(String text,int key)
     {
-        char[] array={'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я',' ','0','1','2','3','4','5','6','7','8','9',};
-        int size=44;
         String result="";
-
+        char[] array={'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я'};
         char[] words = text.toCharArray();
-        char[] words2=gamma.toCharArray();
-
-        int[] C=new int[text.length()];
-        int[] G=new int[text.length()];
-
+        char[] words2=new char[text.length()+1];
 
         for(int i=0;i<text.length();i++)
         {
-            for (int j = 0; j < size; j++)
+            int k=1;
+            for(int j=0;j<33;j++)
             {
-                if (words[i] == array[j])
+                if(words[i]==array[j])
                 {
-                    C[i]=j+1;
+                    k=j+key;
                     break;
                 }
             }
-        }
 
-        for(int i=0,k=0;i<text.length();i++)
-        {
-            for (int j = 0; j < size; j++)
+            if(k>=33)
             {
-                if (words2[k] == array[j])
-                {
-                    G[i]=j+1;
-                    break;
-                }
+                k-=33;
             }
-            k++;
 
-            if(k==gamma.length())
-            {
-                k=0;
-            }
-        }
-
-        int[] res=new int[text.length()];
-
-        for(int i=0;i<text.length();i++)
-        {
-            res[i]=C[i]-G[i]+size;
+            words2[i]=array[k];
         }
         for(int i=0;i<text.length();i++)
         {
-            if(res[i]>size)
-            {
-                res[i]%=size;
-            }
-        }
-        for(int i=0;i<text.length();i++)
-        {
-           result+=array[res[i]-1];
+           result+=words2[i];
         }
 
         return result;
@@ -105,9 +77,9 @@ class Server extends Thread
             DataInputStream is = new DataInputStream(s.getInputStream());
 
             String text=is.readUTF();
-            String gamma=is.readUTF();
+            int key=is.readInt();
 
-            os.writeUTF(decryption(text,gamma));
+            os.writeUTF(caesar(text,key));
 
             is.close();
             os.close();
