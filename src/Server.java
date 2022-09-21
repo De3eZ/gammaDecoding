@@ -79,13 +79,13 @@ public class Server extends Thread{
             DataInputStream in = new DataInputStream(client.getInputStream());
 
             String text=in.readUTF();
+            System.out.println("Исходный текст: "+text);
             String gamma=in.readUTF();
-
-            System.out.println(text);
+            System.out.println("Исходный ключ: "+gamma);
 
             String result=decryption(text,gamma);
 
-            System.out.println(result);
+            System.out.println("Результат: "+result);
 
             out.writeUTF(result);
 
