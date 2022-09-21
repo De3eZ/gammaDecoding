@@ -1,9 +1,12 @@
-import java.net.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-class Server extends Thread
-{
-    public String decryption(String text,String gamma)
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class Server extends Thread{
+
+    public static String decryption(String text, String gamma)
     {
         char[] array={'А','Б','В','Г','Д','Е','Ё','Ж','З','И','Й','К','Л','М','Н','О','П','Р','С','Т','У','Ф','Х','Ц','Ч','Ш','Щ','Ъ','Ы','Ь','Э','Ю','Я',' ','0','1','2','3','4','5','6','7','8','9',};
         int size=44;
@@ -61,62 +64,38 @@ class Server extends Thread
         }
         for(int i=0;i<text.length();i++)
         {
-           result+=array[res[i]-1];
+            result+=array[res[i]-1];
         }
 
         return result;
     }
+    public static void main(String[] args) throws InterruptedException {
 
-    Socket s;
-    int num;
-    public static void main(String args[])
-    {
-        try
-        {
-            int i = 0;
-            ServerSocket server = new ServerSocket(3128, 0,
-                    InetAddress.getByName("localhost"));
-            System.out.println("Сервер запущен");
-            while(true)
-            {
-                new Server(i, server.accept());
-                i++;
-                System.out.println("На сервер поступил запрос №: "+i);
-            }
-        }
-        catch(Exception e)
-        {
-            System.out.println("init error: "+e);
-        }
-    }
-    public Server(int num, Socket s)
-    {
-        this.num = num;
-        this.s = s;
-        setDaemon(true);
-        setPriority(NORM_PRIORITY);
-        start();
-    }
-    public void run()
-    {
-        try
-        {
-            DataOutputStream os = new DataOutputStream(s.getOutputStream());
-            DataInputStream is = new DataInputStream(s.getInputStream());
+        try (ServerSocket server= new ServerSocket(3345)){
+            Socket client = server.accept();
 
-            String text=is.readUTF();
-            String gamma=is.readUTF();
+            DataOutputStream out = new DataOutputStream(client.getOutputStream());
 
-            os.writeUTF(decryption(text,gamma));
+            DataInputStream in = new DataInputStream(client.getInputStream());
 
-            is.close();
-            os.close();
-            s.close();
-        }
-        catch(Exception e)
-        {
-            System.out.println("init error: "+e);
+            String text=in.readUTF();
+            String gamma=in.readUTF();
+
+            System.out.println(text);
+
+            String result=decryption(text,gamma);
+
+            System.out.println(result);
+
+            out.writeUTF(result);
+
+            in.close();
+            out.close();
+
+            client.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
-
