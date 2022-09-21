@@ -10,11 +10,11 @@ public class GammaDecription extends JFrame{
     private JPanel mainPanel;
     private  JTextField Text;
     private JLabel TextLabel;
-    private  JTextField Gamma;
+    private  JTextField Key;
     private JLabel GammaLabel;
     private JButton GetResultButton;
     private JLabel Name;
-    private  JLabel Answer;
+    private JTextField Ans;
 
     public GammaDecription(String title)
     {
@@ -32,10 +32,12 @@ public class GammaDecription extends JFrame{
                     Socket s = new Socket("127.0.0.1", 3128);
                     DataOutputStream os = new DataOutputStream(s.getOutputStream());
                     DataInputStream is = new DataInputStream(s.getInputStream());
+                    String sKey= Key.getText();
+                    int key = Integer.parseInt(sKey.trim());
 
                     os.writeUTF(Text.getText());
-                    os.writeUTF(Gamma.getText());
-                    Answer.setText(is.readUTF());
+                    os.writeInt(key);
+                    Ans.setText(is.readUTF());
                 } catch (Exception er) {
                     System.out.println("init error: " + e);
                 }
